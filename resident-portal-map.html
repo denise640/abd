@@ -1,0 +1,266 @@
+<title>Resident Portal Map</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Public+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a hub node at top, eleven page branches in a wrapping grid, each listing its buttons and where they land for staff */
+:root{
+  --bg:#f4f6f5; --paper:#ffffff; --ink:#1b2a2f; --muted:#5d6b70; --line:#d8dfde;
+  --harbor:#0b6280; --harbor-tint:#e3eff3;
+  --live:#1d6b52; --live-tint:#e2f1ea;
+  --dark:#7a5a12; --dark-tint:#f7eed8;
+  --fix:#8a3b5c; --fix-tint:#f5e5ec;
+  --f-display:"Fraunces",Georgia,serif;
+  --f-body:"Public Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#12191c; --paper:#1a2428; --ink:#e4ecec; --muted:#9aaaae; --line:#2e3c41;
+  --harbor:#6cbbd6; --harbor-tint:#183139;
+  --live:#7fd1ae; --live-tint:#173328;
+  --dark:#e3bf6a; --dark-tint:#33290f;
+  --fix:#e59bbb; --fix-tint:#3a1f2b; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#12191c; --paper:#1a2428; --ink:#e4ecec; --muted:#9aaaae; --line:#2e3c41;
+  --harbor:#6cbbd6; --harbor-tint:#183139;
+  --live:#7fd1ae; --live-tint:#173328;
+  --dark:#e3bf6a; --dark-tint:#33290f;
+  --fix:#e59bbb; --fix-tint:#3a1f2b; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 56px}
+.wrap{max-width:1180px;margin:0 auto;display:flex;flex-direction:column;gap:28px}
+h1,h2,h3{text-wrap:balance;margin:0}
+h1{font-family:var(--f-display);font-size:clamp(28px,4vw,40px);font-weight:600;letter-spacing:-.01em}
+h2{font-family:var(--f-display);font-size:22px;font-weight:600}
+h3{font-size:16px;font-weight:600}
+p{margin:0;max-width:68ch}
+.lede{color:var(--muted);font-size:16px}
+.eyebrow{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+code,.mono{font-family:var(--f-mono);font-size:12.5px}
+.pill{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;padding:2px 9px;border-radius:999px;white-space:nowrap}
+.pill::before{content:"";width:7px;height:7px}
+.p-live{background:var(--live-tint);color:var(--live)} .p-live::before{background:currentColor;border-radius:50%}
+.p-dark{background:var(--dark-tint);color:var(--dark)} .p-dark::before{border:1.5px solid currentColor;border-radius:50%}
+.p-fix{background:var(--fix-tint);color:var(--fix)} .p-fix::before{background:currentColor;transform:rotate(45deg)}
+.legend{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;font-size:13px;color:var(--muted)}
+
+/* verdict band */
+.verdict{background:var(--paper);border:1px solid var(--line);border-left:4px solid var(--fix);border-radius:6px;padding:18px 20px;display:flex;flex-direction:column;gap:10px}
+.verdict ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px}
+
+/* hub */
+.map{display:flex;flex-direction:column;align-items:center;gap:0}
+.hub{background:var(--harbor);color:var(--paper);border-radius:10px;padding:16px 24px;text-align:center;max-width:520px;display:flex;flex-direction:column;gap:4px}
+.hub .t{font-family:var(--f-display);font-size:22px;font-weight:600}
+.hub .s{font-size:13px;opacity:.9}
+.hub .mono{opacity:.85}
+.trunk{width:2px;height:22px;background:var(--line)}
+.branches{width:100%;border-top:2px solid var(--line);padding-top:22px;display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+.node{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:16px;display:flex;flex-direction:column;gap:12px;min-width:0;position:relative}
+.node::before{content:"";position:absolute;top:-23px;left:24px;width:2px;height:22px;background:var(--line)}
+.node-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap}
+.node-head .where{font-size:12px;color:var(--muted)}
+.btns{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+.btn-row{display:grid;grid-template-columns:auto 1fr;gap:4px 10px;align-items:baseline}
+.btn{font-size:12.5px;font-weight:600;border:1px solid var(--harbor);color:var(--harbor);background:var(--harbor-tint);border-radius:5px;padding:1px 8px;white-space:nowrap}
+.does{font-size:13.5px;min-width:0}
+.lands{grid-column:2;font-size:12.5px;color:var(--muted);min-width:0}
+.lands b{color:var(--ink);font-weight:600}
+.note{font-size:12.5px;border-top:1px dashed var(--line);padding-top:10px;color:var(--muted)}
+.note strong{color:var(--ink)}
+
+/* two-col bottom */
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px}
+.panel{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:18px;display:flex;flex-direction:column;gap:12px;min-width:0}
+ol.steps{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:8px}
+ol.steps li{padding-left:4px}
+table{border-collapse:collapse;width:100%;font-size:13.5px}
+.tbl{overflow-x:auto}
+th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.src{font-size:12.5px;color:var(--muted)}
+</style>
+
+<div class="wrap">
+  <header style="display:flex;flex-direction:column;gap:10px">
+    <span class="eyebrow">Schofield admin · Leasing · as of 29 Oct 2026</span>
+    <h1>Resident Portal Map</h1>
+    <p class="lede">Every page a tenant sees, what each button does, and where the information lands on the staff side. Built from the portal plan and the 29 Oct go-live review.</p>
+    <div class="legend">
+      <span class="pill p-live">Live</span> works today
+      <span class="pill p-dark">Off</span> built but switched off on purpose
+      <span class="pill p-fix">Being fixed</span> known bug, fix waiting to ship
+    </div>
+  </header>
+
+  <section class="verdict" aria-labelledby="v-h">
+    <h2 id="v-h">Where things stand</h2>
+    <p><strong>Not ready for real tenants yet.</strong> All pages are built. The 29 Oct review said do not send invites until the fixes in the queue ship. Ken said no invites go out from this review.</p>
+    <ul>
+      <li>Live accounts: 3 (staff test views only). Invites sent: 0. Tenant logins: 0. Payments: 0.</li>
+      <li>Paying rent online inside the portal is switched off. The Pay page sends tenants to Buildium's Resident Center instead.</li>
+      <li>Open questions for Ken: tenant text and email alerts when a request changes, and which extra screens to trim.</li>
+    </ul>
+  </section>
+
+  <section class="map" aria-label="Portal mind map">
+    <div class="hub">
+      <span class="t">Tenant Portal</span>
+      <span class="s">One tenant, one lease. Buildium holds the record; the portal reads it.</span>
+      <span class="mono">schofieldpm.com/tenant</span>
+    </div>
+    <div class="trunk" aria-hidden="true"></div>
+
+    <div class="branches">
+
+      <article class="node">
+        <div class="node-head"><div><h3>Sign in</h3><span class="where">Login + lease picker</span></div><span class="pill p-live">Live</span></div>
+        <ul class="btns">
+          <li class="btn-row"><span class="btn">Send code</span><span class="does">Emails a 6 digit code. Only works after staff send an invite.</span></li>
+          <li class="btn-row"><span class="btn">Verify</span><span class="does">Checks the code and signs them in.</span></li>
+          <li class="btn-row"><span class="btn">Pick a lease</span><span class="does">Shows only if the tenant has two leases.</span></li>
+        </ul>
+        <p class="note"><strong>Starts from staff:</strong> the <b>Send portal invite</b> button on the resident record or the lease Parties tab.</p>
+      </article>
+
+      <article class="node">
+        <div class="node-head"><div><h3>Welcome wizard</h3><span class="where">First sign in only</span></div><span class="pill p-live">Live</span></div>
+        <ul class="btns">
+          <li class="btn-row"><span class="btn">Next / Finish</span><span class="does">Language, phones, emergency contact, vehicles, pets. Finish goes to Home.</span>
+            <span class="lands">Lands: the office gets a notice with what changed.</span></li>
+        </ul>
+        <p class="note">Review suggests trimming this to phone and emergency contact. Ken's call.</p>
+      </article>
+
+      <article class="node">
+        <div class="node-head"><div><h3>Home</h3><span class="where">The landing page</span></div><span class="pill p-fix">Being fixed</span></div>
+        <ul class="btns">
+          <li class="btn-row"><span class="btn">Rent due</span><span class="does">Big figure: what they owe and when. Read from Buildium.</span></li>
+          <li class="btn-row"><span class="btn">Next thing</span><span class="does">Side card: rent due, a vendor visit, or a renewal to answer. Taps through to that page.</span></li>
+          <li class="btn-row"><span class="btn">Open requests</span><span class="does">Count of repairs in progress, opens Requests.</span></li>
+          <li class="btn-row"><span class="btn">Unread</span><span class="does">Count of new office replies, opens Messages.</span></li>
+        </ul>
+        <p class="note"><strong>Bug being fixed:</strong> a missing balance can show $0.00 instead of "Unavailable". Also shows an "In the office today" card (Anisa, Archie, Denise).</p>
+      </article>
+
+      <article class="node">
+        <div class="node-head"><div><h3>Pay rent</h3><span class="where">Pay, methods, autopay, receipts</span></div><span class="pill p-dark">Off</span></div>
+        <ul class="btns">
+          <li class="btn-row"><span class="btn">Pay in the resident center</span><span class="does">What tenants see today. Opens Buildium's Resident Center to pay there.</span>
+            <span class="lands">Lands: Buildium lease ledger, as it always has.</span></li>
+          <li class="btn-row"><span class="btn">Send rent from your own bank</span><span class="does">Only if the lease has its own account number. Copy buttons for routing and account.</span>
+            <span class="lands">Lands: Schofield trust account at Column.</span></li>
+          <li class="btn-row"><span class="btn">Add bank / Autopay</span><span class="does">Built, hidden while the bank option is off.</span></li>
+          <li class="btn-row"><span class="btn">Receipts</span><span class="does">List and PDF of payments made in the portal.</span></li>
+        </ul>
+        <p class="note"><strong>Why off:</strong> Ken, 23 Oct: "don't use it on anybody yet." The pilot list is empty.</p>
+      </article>
+
+      <article class="node">
+        <div class="node-head"><div><h3>Ledger</h3><span class="where">Charges and payments</span></div><span class="pill p-fix">Being fixed</span></div>
+        <ul class="btns">
+          <li class="btn-row"><span class="btn">Months</span><span class="does">Charges, payments, late fees and running balance from the Buildium lease ledger. Read only.</span></li>
+        </ul>
+        <p class="note"><strong>Bug being fixed:</strong> missing amounts show $0.00. Fix makes them say "Unavailable".</p>
+      </article>
+
+      <article class="node">
+        <div class="node-head"><div><h3>Requests</h3><span class="where">Repairs: list, new, detail</span></div><span class="pill p-fix">Being fixed</span></div>
+        <ul class="btns">
+          <li class="btn-row"><span class="btn">New request</span><span class="does">Wizard: what, where, how bad, photos, can we come in, when you're home.</span>
+            <span class="lands">Lands: <b>Maintenance → Work Orders</b> as "Reported", plus a resident request in Buildium.</span></li>
+          <li class="btn-row"><span class="btn">Request row</span><span class="does">Stage word (Received, Assigning, Scheduled, Done) and vendor visit times.</span></li>
+          <li class="btn-row"><span class="btn">Ask about this request</span><span class="does">Opens a Messages thread titled after the request.</span>
+            <span class="lands">Lands: central <b>Messages</b>.</span></li>
+        </ul>
+        <p class="note"><strong>Bugs being fixed:</strong> no staff alert for a normal request, tenant photos labeled "Vendor photo", a booked visit stuck on "Assigning", no limit on emergency pages.</p>
+      </article>
+
+      <article class="node">
+        <div class="node-head"><div><h3>Documents</h3><span class="where">Lease, addenda, notices</span></div><span class="pill p-fix">Being fixed</span></div>
+        <ul class="btns">
+          <li class="btn-row"><span class="btn">Open</span><span class="does">Views a file in the portal. Comes from Buildium files and signed leases.</span></li>
+        </ul>
+        <p class="note"><strong>Bug fixed 29 Oct:</strong> it was listing every Buildium file, even ones not shared with the tenant. A size cap is still waiting to ship. File titles show raw Buildium names.</p>
+      </article>
+
+      <article class="node">
+        <div class="node-head"><div><h3>Messages</h3><span class="where">Talk to the office</span></div><span class="pill p-fix">Being fixed</span></div>
+        <ul class="btns">
+          <li class="btn-row"><span class="btn">New message</span><span class="does">Starts a thread. A person answers; no AI replies.</span>
+            <span class="lands">Lands: central <b>Messages</b> (source "Tenant portal") and a note on the tenant's Buildium record.</span></li>
+          <li class="btn-row"><span class="btn">Reply</span><span class="does">Adds to the thread. Staff replies show here.</span></li>
+        </ul>
+        <p class="note"><strong>Bugs being fixed:</strong> alerts only go to admins, and the thread does not show the property, unit or name.</p>
+      </article>
+
+      <article class="node">
+        <div class="node-head"><div><h3>Notices</h3><span class="where">Notices sent to me</span></div><span class="pill p-live">Live</span></div>
+        <ul class="btns">
+          <li class="btn-row"><span class="btn">Notice row</span><span class="does">Rent increase and other notices, with the date served.</span>
+            <span class="lands">Comes from: <b>Rent Roll</b> increase notices.</span></li>
+        </ul>
+        <p class="note">Review suggests folding this into Documents. Increase notices show "No document" today.</p>
+      </article>
+
+      <article class="node">
+        <div class="node-head"><div><h3>Lease</h3><span class="where">Term, renewal, move-out, deposit</span></div><span class="pill p-fix">Being fixed</span></div>
+        <ul class="btns">
+          <li class="btn-row"><span class="btn">Accept / Decline / Counter</span><span class="does">Answers a renewal offer.</span>
+            <span class="lands">Lands: <b>Leasing → Renewals</b>, and a note in Buildium.</span></li>
+          <li class="btn-row"><span class="btn">Give move-out notice</span><span class="does">Date, forwarding address, reason.</span>
+            <span class="lands">Lands: the move-out case. No admin screen yet; staff get a notice.</span></li>
+          <li class="btn-row"><span class="btn">Deposit status</span><span class="does">Deposit held and how it will come back (mailed check only).</span></li>
+        </ul>
+        <p class="note"><strong>Bug being fixed:</strong> page took 15 to 19 seconds to load. Speed fix is in the queue.</p>
+      </article>
+
+      <article class="node">
+        <div class="node-head"><div><h3>Profile</h3><span class="where">Contacts, emergency, vehicles, pets</span></div><span class="pill p-live">Live</span></div>
+        <ul class="btns">
+          <li class="btn-row"><span class="btn">Edit / Add</span><span class="does">Changes phones, emergency contact, vehicles, pets.</span>
+            <span class="lands">Lands: office notice, and staff see it on the lease Parties tab under "From the resident portal". Phones do not update Buildium yet (switched off).</span></li>
+          <li class="btn-row"><span class="btn">ES | EN</span><span class="does">Switches the whole portal between English and Spanish.</span></li>
+        </ul>
+      </article>
+
+    </div>
+  </section>
+
+  <div class="cols">
+    <section class="panel" aria-labelledby="w-h">
+      <h2 id="w-h">How to walk it yourself</h2>
+      <p class="src">Safe: this view is read only, sends nothing to the tenant, and ends after 30 minutes.</p>
+      <ol class="steps">
+        <li>Go to <b>Leasing → Test portal</b> (<code>/admin/leasing/test-portal</code>). Admin access needed.</li>
+        <li>Pick any current resident. "Not invited yet" is fine.</li>
+        <li>Switch between <b>Computer</b> and <b>Phone</b> frames at the top.</li>
+        <li>Click through each page on the map above. Buttons that would save something stay visible but are refused. That is expected, not a bug.</li>
+        <li>Anything else that looks wrong: file it on <b>Business Management → Bug Hunting</b>.</li>
+        <li>Click <b>Sign out</b> in the frame when done.</li>
+      </ol>
+      <p class="note"><strong>Known test portal issues, already logged:</strong> no "View their portal" link from the resident record, a resident with no email shows a red error, and the address bar always reads <code>/tenant/home</code>.</p>
+    </section>
+
+    <section class="panel" aria-labelledby="q-h">
+      <h2 id="q-h">Staff side: where tenant actions show up</h2>
+      <div class="tbl">
+        <table>
+          <thead><tr><th>Tenant does</th><th>Staff see it in</th></tr></thead>
+          <tbody>
+            <tr><td>Files a repair</td><td>Maintenance → Work Orders, and Buildium</td></tr>
+            <tr><td>Sends a message</td><td>Messages (Tenant portal), Buildium note</td></tr>
+            <tr><td>Answers a renewal</td><td>Leasing → Renewals</td></tr>
+            <tr><td>Gives move-out notice</td><td>Staff notice (no screen yet)</td></tr>
+            <tr><td>Edits profile</td><td>Office notice, lease Parties tab</td></tr>
+            <tr><td>Pays rent</td><td>Buildium Resident Center today</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="note"><strong>Staff buttons:</strong> Send portal invite (resident record, lease Parties tab), turn a tenant's login off or on, and Test portal.</p>
+    </section>
+  </div>
+
+  <p class="src">Sources: Schofield docs "Tenant Portal program ledger" and "Tenant portal go-live review (29 Oct 2026)". Status reflects those documents, not a live check of each page.</p>
+</div>
